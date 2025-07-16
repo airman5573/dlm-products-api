@@ -132,7 +132,7 @@ class DLM_Products_API_REST_Controller extends WP_REST_Controller {
                 $dlm_settings = $this->get_product_dlm_settings($product);
                 
                 // Get software ID if available (from DLM Pro)
-                $software_id = get_post_meta($product_id, '_dlm_software_id', true);
+                $software_id = get_post_meta($product_id, 'dlm_software_id', true);
                 if (empty($software_id) && class_exists('\IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\Software')) {
                     // Try to find software by product ID
                     $software_repo = \IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\Software::instance();
