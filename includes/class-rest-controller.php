@@ -145,26 +145,42 @@ class DLM_Products_API_REST_Controller extends WP_REST_Controller {
                 // Get current version from software release if available
                 $current_version = '';
                 $stable_release = null;
+                $software_info = null;
                 
-                if ($software_id && class_exists('\IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\SoftwareReleases')) {
-                    $releases_repo = \IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\SoftwareReleases::instance();
-                    $stable_release_data = $releases_repo->findBy(array(
-                        'software_id' => $software_id,
-                        'is_stable' => 1
-                    ));
+                if ($software_id) {
+                    // Get software entity for documentation and support URLs
+                    if (class_exists('\IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\Software')) {
+                        $software_repo = \IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\Software::instance();
+                        $software_entity = $software_repo->find($software_id);
+                        if ($software_entity) {
+                            $software_info = array(
+                                'documentation' => $software_entity->getDocumentation(),
+                                'support' => $software_entity->getSupport(),
+                            );
+                        }
+                    }
                     
-                    if ($stable_release_data && !empty($stable_release_data)) {
-                        $release = $stable_release_data[0];
-                        $current_version = $release->getVersion();
+                    // Get stable release info
+                    if (class_exists('\IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\SoftwareReleases')) {
+                        $releases_repo = \IdeoLogix\DigitalLicenseManagerPro\Database\Repositories\SoftwareReleases::instance();
+                        $stable_release_data = $releases_repo->findBy(array(
+                            'software_id' => $software_id,
+                            'is_stable' => 1
+                        ));
                         
-                        // Build stable release info
-                        $stable_release = array(
-                            'id' => $release->getId(),
-                            'version' => $release->getVersion(),
-                            'download_url' => home_url('/wp-json/dlm/v1/software/download/'),
-                            'changelog' => $release->getChangelog(),
-                            'created_at' => $release->getCreatedAt(),
-                        );
+                        if ($stable_release_data && !empty($stable_release_data)) {
+                            $release = $stable_release_data[0];
+                            $current_version = $release->getVersion();
+                            
+                            // Build stable release info
+                            $stable_release = array(
+                                'id' => $release->getId(),
+                                'version' => $release->getVersion(),
+                                'download_url' => home_url('/wp-json/dlm/v1/software/download/'),
+                                'changelog' => $release->getChangelog(),
+                                'created_at' => $release->getCreatedAt(),
+                            );
+                        }
                     }
                 }
                 
@@ -184,6 +200,7 @@ class DLM_Products_API_REST_Controller extends WP_REST_Controller {
                     'currency'        => get_woocommerce_currency(),
                     'dlm_settings'    => $dlm_settings,
                     'stable_release'  => $stable_release,
+                    'software_info'   => $software_info,
                 );
                 
                 $products[] = $product_data;
