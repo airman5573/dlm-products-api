@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: DLM Products API
- * Plugin URI: https://wordpress.org/plugins/digital-license-manager/
+ * Plugin URI: https://shoplic.kr
  * Description: Provides a REST API endpoint for retrieving WooCommerce products with Digital License Manager integration
  * Version: 1.0.1
- * Author: Digital License Manager
+ * Author: shoplic
  * Text Domain: dlm-products-api
  * Domain Path: /languages
  * Requires at least: 5.0
