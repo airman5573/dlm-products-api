@@ -180,6 +180,16 @@ class DLM_Products_API_REST_Controller extends WP_REST_Controller {
                                 'changelog' => $release->getChangelog(),
                                 'created_at' => $release->getCreatedAt(),
                             );
+                            
+                            // Try to get version requirements
+                            $tested_wp = method_exists($release, 'getTestedWp') ? $release->getTestedWp() : null;
+                            $requires_wp = method_exists($release, 'getRequiresWp') ? $release->getRequiresWp() : null;
+                            $requires_php = method_exists($release, 'getRequiresPhp') ? $release->getRequiresPhp() : null;
+                            
+                            // Add to stable_release array if available
+                            if ($tested_wp) $stable_release['tested_wp'] = $tested_wp;
+                            if ($requires_wp) $stable_release['requires_wp'] = $requires_wp;
+                            if ($requires_php) $stable_release['requires_php'] = $requires_php;
                         }
                     }
                 }
@@ -210,6 +220,7 @@ class DLM_Products_API_REST_Controller extends WP_REST_Controller {
         }
         
         // Prepare response
+        
         $response = array(
             'success' => true,
             'data'    => $products,
